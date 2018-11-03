@@ -40,3 +40,6 @@ npm-debug.log
 # secrets files as long as you replace their contents by environment
 # variables.
 /config/*.secret.exs
+
+# ignore dev.exs to allow using databases on different computers
+/config/dev.exs
