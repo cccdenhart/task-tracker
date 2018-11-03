@@ -9,3 +9,15 @@
 #
 # We recommend using the bang functions (`insert!`, `update!`
 # and so on) as they will fail if something goes wrong.
+
+alias TaskTracker.Repo
+alias TaskTracker.Users.User
+
+pwhash = Argon2.hash_pwd_salt("pass1")
+
+Repo.insert!(%User{email: "user1@example.com", is_manager: true, password_hash: pwhash})
+Repo.insert!(%User{email: "user2@example.com", is_manager: false, manager: "user1@example.com", password_hash: pwhash})
+
+alias TaskTracker.Tasks.Task
+#Repo.insert!(%Task{title: "hw", description: "due friday", username: "user1@example.com", user_id: 1})
+

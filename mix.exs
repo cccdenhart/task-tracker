@@ -36,6 +36,8 @@ defmodule TaskTracker.MixProject do
       {:phoenix, "~> 1.4.0-rc.2"},
       {:phoenix_pubsub, "~> 1.1"},
       {:phoenix_ecto, "~> 3.2"},
+      {:comeonin, "~> 4.1"},
+      {:argon2_elixir, "~> 1.3"},
       {:postgrex, ">= 0.0.0"},
       {:phoenix_html, "~> 2.11"},
       {:phoenix_live_reload, "~> 1.2-rc", only: :dev},
