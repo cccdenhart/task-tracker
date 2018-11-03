@@ -9,7 +9,7 @@
 #
 # We recommend using the bang functions (`insert!`, `update!`
 # and so on) as they will fail if something goes wrong.
-alias TaskTracker.repo
+alias TaskTracker.Repo
 alias TaskTracker.Users.User
 
 pwhash = Argon2.hash_pwd_salt("pass1")
