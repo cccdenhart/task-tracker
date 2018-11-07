@@ -41,5 +41,3 @@ npm-debug.log
 # variables.
 /config/*.secret.exs
 
-# ignore dev.exs to allow using databases on different computers
-/config/dev.exs

@@ -4,6 +4,10 @@ import _ from 'lodash';
 import $ from 'jquery';
 import { Link, BrowserRouter as Router, Route } from 'react-router-dom';
 
+import UserList from './user_list';
+import TaskList from './task_list';
+import Header from './header';
+
 export default function root_init(node) {
   let prods = window.tasks;
   ReactDOM.render(<Root tasks={prods} />, node);
@@ -45,13 +49,35 @@ class Root extends React.Component {
     });
   }
 
+  fetch_all() {
+    this.fetch_users();
+    this.fetch_tasks();
+  }
+
+  send_post(path, req, on_success) {
+    $.ajax(path, {
+      method: "post",
+      dataType: "json",
+      contentType: "application/json; charset=UTF-8",
+      data: JSON.stringify(req),
+      success: on_success,
+    });
+  }
+
+  add_task() {
+    let user_id = this.state.session.user_id;
+
+  }
+
   render() {
     return <div>
       <Router>
         <div>
           <Header root={this} />
           <Route path="/" exact={true} render={() =>
-            <TaskList tasks={this.state.tasks} />
+            <div>
+              <TaskList tasks={this.state.tasks} users={this.state.users} root={this} />
+            </div>
           } />
           <Route path="/users" exact={true} render={() =>
             <UserList users={this.state.users} />
@@ -60,68 +86,4 @@ class Root extends React.Component {
       </Router>
     </div>;
   }
-}
-
-function Header(props) {
-  let {root} = props;
-  return <div className="row my-2">
-    <div className="col-4">
-      <h1><Link to={"/"}>Task Organizer</Link></h1>
-    </div>
-    <div className="col-2">
-      <p><Link to={"/users"} onClick={root.fetch_users.bind(root)}>Users</Link></p>
-    </div>
-    <div className="col-6">
-      <div className="form-inline my-2">
-        <input type="email" placeholder="email" />
-        <input type="password" placeholder="password" />
-        <button className="btn btn-secondary">Login</button>
-      </div>
-    </div>
-  </div>;
-}
-
-function TaskList(props) {
-  let prods = _.map(props.tasks, (t) => <Task key={t.id} task={t} />);
-  return <div className="row">
-    {prods}
-  </div>;
-}
-
-function Task(props) {
-  let {task} = props;
-  return <div className="card col-4">
-    <div className="card-body">
-      <h2 className="card-title">{task.title}</h2>
-      <p className="card-text">{task.description} <br/>
-      is_complete: {task.is_complete}</p>
-    </div>
-  </div>;
-}
-
-function UserList(props) {
-  let rows = _.map(props.users, (uu) => <User key={uu.id} user={uu} />);
-  return <div className="row">
-    <div className="col-12">
-      <table className="table table-striped">
-        <thead>
-          <tr>
-            <th>email</th>
-            <th>manager?</th>
-          </tr>
-        </thead>
-        <tbody>
-          {rows}
-        </tbody>
-      </table>
-    </div>
-  </div>;
-}
-
-function User(props) {
-  let {user} = props;
-  return <tr>
-    <td>{user.email}</td>
-    <td>{user.is_manager ? "yes" : "no"}</td>
-  </tr>;
 }
