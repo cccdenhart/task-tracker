@@ -19,8 +19,12 @@ class Root extends React.Component {
     this.state = {
       tasks: props.tasks,
       users: [],
+      session: null,
     };
 
+    this.fetch_tasks();
+    this.fetch_users();
+    //this.create_session("alice@example.com", "pass1");
   }
 
   fetch_tasks() {
@@ -49,11 +53,6 @@ class Root extends React.Component {
     });
   }
 
-  fetch_all() {
-    this.fetch_users();
-    this.fetch_tasks();
-  }
-
   send_post(path, req, on_success) {
     $.ajax(path, {
       method: "post",
@@ -61,6 +60,28 @@ class Root extends React.Component {
       contentType: "application/json; charset=UTF-8",
       data: JSON.stringify(req),
       success: on_success,
+    });
+  }
+
+  handle_login(e) {
+    e.preventDefault();
+    let email = document.getElementById("email-login").value;
+    let pword = document.getElementById("pword-login").value;
+    console.log("email: ", email);
+    console.log("pword: ", pword);
+    this.create_session(email, pword);
+  }
+
+  create_session(email, password) {
+    $.ajax("/api/v1/sessions", {
+      method: "post",
+      dataType: "json",
+      contentType: "application/json; charset=UTF-8",
+      data: JSON.stringify({email, password}),
+      success: (resp) => {
+        let state1 = _.assign({}, this.state, { session: resp.data });
+        this.setState(state1);
+      }
     });
   }
 
@@ -73,7 +94,7 @@ class Root extends React.Component {
     return <div>
       <Router>
         <div>
-          <Header root={this} />
+          <Header root={this} session={this.state.session} />
           <Route path="/" exact={true} render={() =>
             <div>
               <TaskList tasks={this.state.tasks} users={this.state.users} root={this} />
