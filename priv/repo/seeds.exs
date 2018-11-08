@@ -15,14 +15,14 @@ alias TaskTracker.Users
 
 pwhash = Argon2.hash_pwd_salt("pass1")
 
-#Repo.insert!(%User{email: "alice@example.com", is_manager: true, password_hash: pwhash})
-#Repo.insert!(%User{email: "bob@example.com", is_manager: false, password_hash: pwhash, manager: "alice@example.com"})
-Repo.insert!(%User{email: "charlie@example.com", is_manager: false, password_hash: pwhash, manager: "bob@example.com"})
+Repo.insert!(%User{email: "alice@example.com", password_hash: pwhash})
+Repo.insert!(%User{email: "bob@example.com", password_hash: pwhash})
+Repo.insert!(%User{email: "charlie@example.com", password_hash: pwhash})
 
 alias TaskTracker.Tasks.Task
-#Repo.insert!(%Task{title: "homework", description: "due friday", username: "alice@example.com", user_id: Users.get_user_by_email("alice@example.com").id})
-#Repo.insert!(%Task{title: "red sox", description: "playing the yankees", username: "bob@example.com", user_id: Users.get_user_by_email("bob@example.com").id})
-#Repo.insert!(%Task{title: "example", description: "example description", username: "alice@example.com", user_id: Users.get_user_by_email("alice@example.com").id})
+Repo.insert!(%Task{title: "homework", description: "due friday", username: "alice@example.com", user_id: Users.get_user_by_email("alice@example.com").id})
+Repo.insert!(%Task{title: "red sox", description: "playing the yankees", username: "bob@example.com", user_id: Users.get_user_by_email("bob@example.com").id})
+Repo.insert!(%Task{title: "example", description: "example description", username: "alice@example.com", user_id: Users.get_user_by_email("alice@example.com").id})
 Repo.insert!(%Task{title: "testing", description: "testing description", username: "charlie@example.com", user_id: Users.get_user_by_email("charlie@example.com").id})
 Repo.insert!(%Task{title: "music", description: "music description", username: "bob@example.com", user_id: Users.get_user_by_email("bob@example.com").id})
 Repo.insert!(%Task{title: "movie", description: "movie description", username: "alice@example.com", user_id: Users.get_user_by_email("alice@example.com").id})

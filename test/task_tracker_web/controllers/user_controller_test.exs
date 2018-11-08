@@ -6,17 +6,13 @@ defmodule TaskTrackerWeb.UserControllerTest do
 
   @create_attrs %{
     email: "some email",
-    is_manager: true,
-    manager: "some manager",
     password_hash: "some password_hash"
   }
   @update_attrs %{
     email: "some updated email",
-    is_manager: false,
-    manager: "some updated manager",
     password_hash: "some updated password_hash"
   }
-  @invalid_attrs %{email: nil, is_manager: nil, manager: nil, password_hash: nil}
+  @invalid_attrs %{email: nil, password_hash: nil}
 
   def fixture(:user) do
     {:ok, user} = Users.create_user(@create_attrs)
@@ -44,8 +40,6 @@ defmodule TaskTrackerWeb.UserControllerTest do
       assert %{
                "id" => id,
                "email" => "some email",
-               "is_manager" => true,
-               "manager" => "some manager",
                "password_hash" => "some password_hash"
              } = json_response(conn, 200)["data"]
     end
@@ -68,8 +62,6 @@ defmodule TaskTrackerWeb.UserControllerTest do
       assert %{
                "id" => id,
                "email" => "some updated email",
-               "is_manager" => false,
-               "manager" => "some updated manager",
                "password_hash" => "some updated password_hash"
              } = json_response(conn, 200)["data"]
     end
@@ -87,9 +79,9 @@ defmodule TaskTrackerWeb.UserControllerTest do
       conn = delete(conn, Routes.user_path(conn, :delete, user))
       assert response(conn, 204)
 
-      assert_error_sent 404, fn ->
+      assert_error_sent(404, fn ->
         get(conn, Routes.user_path(conn, :show, user))
-      end
+      end)
     end
   end
 
