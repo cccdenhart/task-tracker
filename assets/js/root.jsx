@@ -9,8 +9,8 @@ import TaskList from './task_list';
 import Header from './header';
 
 export default function root_init(node) {
-  let prods = window.tasks;
-  ReactDOM.render(<Root tasks={prods} />, node);
+  let all_tasks = window.tasks;
+  ReactDOM.render(<Root tasks={all_tasks} />, node);
 }
 
 class Root extends React.Component {
@@ -63,13 +63,9 @@ class Root extends React.Component {
     });
   }
 
-  handle_login(e) {
-    e.preventDefault();
-    let email = document.getElementById("email-login").value;
-    let pword = document.getElementById("pword-login").value;
-    console.log("email: ", email);
-    console.log("pword: ", pword);
-    this.create_session(email, pword);
+  get_user_by_email(email) {
+    user = _.find(this.state.users, function(u) {return u.email === email; });
+    return user.id;
   }
 
   create_session(email, password) {
@@ -85,9 +81,29 @@ class Root extends React.Component {
     });
   }
 
-  add_task() {
-    let user_id = this.state.session.user_id;
+  handle_login() {
+    let email = document.getElementById("email-login").value;
+    let pword = document.getElementById("pword-login").value;
+    console.log("email type: ", typeof email);
+    console.log("pword type: ", typeof pword);
+    this.create_session(email, pword);
+  }
 
+  add_task() {
+    let title = document.getElementById("title").value;
+    let desc = document.getElementById("desc").value;
+    let user = document.getElementById("user").value;
+    let user_id = this.get_user_by_email(user).id;
+    $.ajax("/api/v1/tasks", {
+      method: "post",
+      dataType: "json",
+      contentType: "application/json; charset=UTF-8",
+      data: JSON.stringify({title, desc, user, user_id}),
+      success: (resp) => {
+        let state1 = _.assign({}, this.state, { tasks: resp.data });
+        this.setState(state1);
+      }
+    });
   }
 
   render() {

@@ -18,11 +18,11 @@ export default function Header(props) {
 
 function Login(props) {
   let {root, session} = props;
-  if (session == null) {
-    return <form className="form-inline my-2" onSubmit={root.handle_login}>
+  if (session === null) {
+    return <form className="form-inline my-2">
       <input id="email-login" type="email" placeholder="email" />
       <input id="pword-login" type="password" placeholder="password" />
-      <button type="submit" className="btn btn-secondary">Login</button>
+      <button className="btn btn-secondary" onClick={() => root.handle_login}>Login</button>
     </form>;
   }
   return <div>
