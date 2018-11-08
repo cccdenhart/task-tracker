@@ -1,12 +1,15 @@
-import React from 'react';
-import ReactDOM from 'react-dom';
-import _ from 'lodash';
-import $ from 'jquery';
-import { Link, BrowserRouter as Router, Route } from 'react-router-dom';
+import React from "react";
+import ReactDOM from "react-dom";
+import _ from "lodash";
+import $ from "jquery";
+import { Link, BrowserRouter as Router, Route } from "react-router-dom";
 
-import UserList from './user_list';
-import TaskList from './task_list';
-import Header from './header';
+import UserList from "./user_list";
+import TaskList from "./task_list";
+import Header from "./header";
+import AddTask from "./add_task";
+import AddUser from "./add_user";
+import Footer from "./footer";
 
 export default function root_init(node) {
   let all_tasks = window.tasks;
@@ -20,11 +23,16 @@ class Root extends React.Component {
       tasks: props.tasks,
       users: [],
       session: null,
+      is_adding: false,
+      is_registering: false,
+      cur_user: null
     };
 
     this.fetch_tasks();
     this.fetch_users();
-    //this.create_session("alice@example.com", "pass1");
+    if (this.state.cur_user != null) {
+      this.create_session(this.state.cur_user.email, this.state.cur_user.pword);
+    }
   }
 
   fetch_tasks() {
@@ -33,10 +41,10 @@ class Root extends React.Component {
       dataType: "json",
       contentType: "application/json; charset=UTF-8",
       data: "",
-      success: (resp) => {
+      success: resp => {
         let state1 = _.assign({}, this.state, { tasks: resp.data });
         this.setState(state1);
-      },
+      }
     });
   }
 
@@ -46,10 +54,10 @@ class Root extends React.Component {
       dataType: "json",
       contentType: "application/json; charset=UTF-8",
       data: "",
-      success: (resp) => {
+      success: resp => {
         let state1 = _.assign({}, this.state, { users: resp.data });
         this.setState(state1);
-      },
+      }
     });
   }
 
@@ -59,12 +67,14 @@ class Root extends React.Component {
       dataType: "json",
       contentType: "application/json; charset=UTF-8",
       data: JSON.stringify(req),
-      success: on_success,
+      success: on_success
     });
   }
 
   get_user_by_email(email) {
-    user = _.find(this.state.users, function(u) {return u.email === email; });
+    user = _.find(this.state.users, function(u) {
+      return u.email === email;
+    });
     return user.id;
   }
 
@@ -73,20 +83,45 @@ class Root extends React.Component {
       method: "post",
       dataType: "json",
       contentType: "application/json; charset=UTF-8",
-      data: JSON.stringify({email, password}),
-      success: (resp) => {
+      data: JSON.stringify({ email, password }),
+      success: resp => {
         let state1 = _.assign({}, this.state, { session: resp.data });
         this.setState(state1);
       }
     });
   }
 
-  handle_login() {
+  login() {
     let email = document.getElementById("email-login").value;
     let pword = document.getElementById("pword-login").value;
     console.log("email type: ", typeof email);
     console.log("pword type: ", typeof pword);
-    this.create_session(email, pword);
+    let state1 = _.assign({}, this.state, {
+      cur_user: this.get_user_by_email(email)
+    });
+    this.setState(state1);
+  }
+
+  log_out() {}
+
+  add_user() {
+    let email = document.getElementById("email").value;
+    let pword = document.getElementById("pword").value;
+    $.ajax("/api/v1/users", {
+      method: "post",
+      dataType: "json",
+      contentType: "application/json; charset=UTF-8",
+      data: JSON.stringify({ email, pword }),
+      success: resp => {
+        let state1 = _.assign({}, this.state, { users: resp.data });
+        this.setState(state1);
+      }
+    });
+  }
+
+  switch_to_register() {
+    let state1 = _.assign({}, this.state, { is_registering: true });
+    this.setState(state1);
   }
 
   add_task() {
@@ -98,29 +133,61 @@ class Root extends React.Component {
       method: "post",
       dataType: "json",
       contentType: "application/json; charset=UTF-8",
-      data: JSON.stringify({title, desc, user, user_id}),
-      success: (resp) => {
+      data: JSON.stringify({ title, desc, user, user_id }),
+      success: resp => {
         let state1 = _.assign({}, this.state, { tasks: resp.data });
         this.setState(state1);
       }
     });
   }
 
+  switch_to_add() {
+    let state1 = _.assign({}, this.state, { is_adding: true });
+    this.setState(state1);
+  }
+
+  to_home() {
+    console.log("TOHOME");
+    let state1 = _.assign({}, this.state, {
+      is_adding: false,
+      is_registering: false
+    });
+    this.fetch_tasks.bind(this);
+    //this.setState(state1);
+  }
+
   render() {
-    return <div>
-      <Router>
-        <div>
-          <Header root={this} session={this.state.session} />
-          <Route path="/" exact={true} render={() =>
-            <div>
-              <TaskList tasks={this.state.tasks} users={this.state.users} root={this} />
-            </div>
-          } />
-          <Route path="/users" exact={true} render={() =>
-            <UserList users={this.state.users} />
-          } />
-        </div>
-      </Router>
-    </div>;
+    let main;
+
+    if (this.state.is_adding) {
+      main = (
+        <AddTask
+          root={this}
+          users={this.state.users}
+          is_adding={this.state.is_adding}
+        />
+      );
+    } else if (this.state.is_registering) {
+      main = <AddUser root={this} />;
+    } else {
+      main = <TaskList root={this} tasks={this.state.tasks} />;
+    }
+
+    return (
+      <div>
+        <Router>
+          <div>
+            <Header root={this} session={this.state.session} />
+            <Route path="/" exact={true} render={() => <div>{main}</div>} />
+            <Route
+              path="/users"
+              exact={true}
+              render={() => <UserList users={this.state.users} />}
+            />
+            <Footer root={this} />
+          </div>
+        </Router>
+      </div>
+    );
   }
 }
