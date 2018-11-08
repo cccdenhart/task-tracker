@@ -102,20 +102,18 @@ class Root extends React.Component {
     this.setState(state1);
   }
 
-  log_out() {}
+  log_out() {
+    let state1 = _.assign({}, this.state, { session: null });
+    this.setState(state1);
+  }
 
   add_user() {
     let email = document.getElementById("email").value;
     let pword = document.getElementById("pword").value;
-    $.ajax("/api/v1/users", {
-      method: "post",
-      dataType: "json",
-      contentType: "application/json; charset=UTF-8",
-      data: JSON.stringify({ email, pword }),
-      success: resp => {
-        let state1 = _.assign({}, this.state, { users: resp.data });
-        this.setState(state1);
-      }
+    this.send_post("/api/v1/users", { email, pword }, resp => {
+      let users1 = _.concat(this.state.users, [resp.data]);
+      let state1 = _.assign({}, this.state, { users: users1 });
+      this.setState(state1);
     });
   }
 
@@ -129,15 +127,10 @@ class Root extends React.Component {
     let desc = document.getElementById("desc").value;
     let user = document.getElementById("user").value;
     let user_id = this.get_user_by_email(user).id;
-    $.ajax("/api/v1/tasks", {
-      method: "post",
-      dataType: "json",
-      contentType: "application/json; charset=UTF-8",
-      data: JSON.stringify({ title, desc, user, user_id }),
-      success: resp => {
-        let state1 = _.assign({}, this.state, { tasks: resp.data });
-        this.setState(state1);
-      }
+    this.send_post("/api/v1/tasks", { title, desc, user, user_id }, resp => {
+      let tasks1 = _.concat(this.state.tasks, [resp.data]);
+      let state1 = _.assign({}, this.state, { tasks: tasks1 });
+      this.setState(state1);
     });
   }
 
@@ -153,7 +146,7 @@ class Root extends React.Component {
       is_registering: false
     });
     this.fetch_tasks.bind(this);
-    //this.setState(state1);
+    this.setState(state1);
   }
 
   render() {
