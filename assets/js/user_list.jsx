@@ -1,7 +1,9 @@
 import React from "react";
+import { connect } from "react-redux";
+import _ from "lodash";
 
 // taken from Nat's Notes
-export default function UserList(props) {
+function UserList(props) {
   let rows = _.map(props.users, uu => <User key={uu.id} user={uu} />);
   console.log("user: ", props.users);
   return (
@@ -30,3 +32,7 @@ function User(props) {
     </tr>
   );
 }
+
+export default connect(state => {
+  return { users: state.users };
+})(UserList);

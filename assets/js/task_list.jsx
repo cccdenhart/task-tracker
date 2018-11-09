@@ -1,8 +1,11 @@
 import React from "react";
+import { connect } from "react-redux";
 import _ from "lodash";
 
-export default function TaskList(props) {
-  let { root, tasks } = props;
+import api from "./api";
+
+function TaskList(props) {
+  let { root, tasks, dispatch } = props;
   let all_t = _.map(tasks, t => <Task key={t.id} task={t} />);
   return (
     <div className="container">
@@ -43,3 +46,13 @@ function Task(props) {
     </div>
   );
 }
+
+function state2props(state) {
+  console.log("rerender", state);
+  return {
+    tasks: state.tasks,
+    add_task: state.add_task_forms
+  };
+}
+
+export default connect(state2props)(TaskList);
